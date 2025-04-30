@@ -1,38 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import "./App.css";
 
+const serverURL = "https://ticketing-system-api-o2lm.onrender.com/";
 function App() {
   const [file, setFile] = useState(null);
   const [files, setFiles] = useState([]);
-  const [feedback, setFeedback] = useState('');
-  const [selectedFile, setSelectedFile] = useState('');
+  const [feedback, setFeedback] = useState("");
+  const [selectedFile, setSelectedFile] = useState("");
   const [fileFeedbacks, setFileFeedbacks] = useState([]);
 
   const uploadFile = async () => {
     const formData = new FormData();
-    formData.append('file', file);
-    await axios.post('http://localhost:5000/upload', formData);
+    formData.append("file", file);
+    await axios.post(`${serverURL}upload`, formData);
     fetchFiles();
   };
 
   const fetchFiles = async () => {
-    const res = await axios.get('http://localhost:5000/files');
+    const res = await axios.get(`${serverURL}files`);
     setFiles(res.data);
   };
 
   const fetchFeedback = async (filename) => {
-    const res = await axios.get(`http://localhost:5000/feedback/${filename}`);
+    const res = await axios.get(`${serverURL}feedback/${filename}`);
     setFileFeedbacks(res.data);
   };
 
   const submitFeedback = async () => {
-    await axios.post('http://localhost:5000/feedback', {
+    await axios.post(`${serverURL}feedback`, {
       filename: selectedFile,
       feedback,
     });
     fetchFeedback(selectedFile);
-    setFeedback('');
+    setFeedback("");
   };
 
   useEffect(() => {
@@ -49,7 +50,9 @@ function App() {
           className="file-input"
           onChange={(e) => setFile(e.target.files[0])}
         />
-        <button className="btn" onClick={uploadFile}>Upload</button>
+        <button className="btn" onClick={uploadFile}>
+          Upload
+        </button>
       </div>
 
       <h2 className="section-title">Uploaded Files</h2>
@@ -57,16 +60,19 @@ function App() {
         {files.map((file) => (
           <li key={file} className="file-item">
             <a
-              href={`http://localhost:5000/download/${file}`}
+              href={`${serverURL}download/${file}`}
               className="file-link"
               download
             >
               {file}
             </a>
-            <button className="btn" onClick={() => {
-              setSelectedFile(file);
-              fetchFeedback(file);
-            }}>
+            <button
+              className="btn"
+              onClick={() => {
+                setSelectedFile(file);
+                fetchFeedback(file);
+              }}
+            >
               View Feedback
             </button>
           </li>
